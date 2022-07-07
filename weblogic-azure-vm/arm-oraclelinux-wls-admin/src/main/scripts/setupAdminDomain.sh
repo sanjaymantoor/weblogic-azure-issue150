@@ -75,15 +75,16 @@ function cleanup()
     echo "Cleanup completed."
 }
 
-# This function verifies whether JKS certificate is valid and not expired
-function verifyJKSCertValidity()
+# This function verifies whether certificate is valid and not expired
+function verifyCertValidity()
 {
     KEYSTORE=$1
     PASSWORD=$2
     CURRENT_DATE=$3
     MIN_CERT_VALIDITY=$4
+    KEY_STORE_TYPE=$5
     VALIDITY=$(($CURRENT_DATE + ($MIN_CERT_VALIDITY*24*60*60)))
-  
+    
     if [ $VALIDITY -le $CURRENT_DATE ];
     then
         echo "Error : Invalid minimum validity days supplied"
@@ -91,14 +92,14 @@ function verifyJKSCertValidity()
   	fi 
 
 	# Check whether KEYSTORE supplied can be opened for reading
-	runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype JKS"
+	runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE"
 	if [ $? != 0 ];
 	then
 		echo "Error opening the keystore : $KEYSTORE"
 		exit 1
 	fi
 
-	aliasList=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype JKS | grep Alias" |awk '{print $3}'`
+	aliasList=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE | grep Alias" |awk '{print $3}'`
 	if [[ -z $aliasList ]]; 
 	then 
 		echo "Error : No alias found in supplied certificate"
@@ -107,52 +108,19 @@ function verifyJKSCertValidity()
 	
 	for alias in $aliasList 
 	do
-		VALIDITY_PERIOD=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype JKS -alias $alias | grep Valid"`
+		VALIDITY_PERIOD=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE -alias $alias | grep Valid"`
 		echo "$KEYSTORE is \"$VALIDITY_PERIOD\""
 		CERT_UNTIL_DATE=`echo $VALIDITY_PERIOD | awk -F'until:|\r' '{print $2}'`
 		CERT_UNTIL_SECONDS=`date -d "$CERT_UNTIL_DATE" +%s`
 		VALIDITY_REMIANS_SECONDS=`expr $CERT_UNTIL_SECONDS - $VALIDITY`
 		if [[ $VALIDITY_REMIANS_SECONDS -le 0 ]];
 		then
-			echo "Error : Supplied JKS certificate is either expired or expiring soon within $MIN_CERT_VALIDITY days"
+			echo "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY days"
 			exit 1
 		fi		
 	done
 }
 
-# This function verifies whether JKS certificate is valid and not expired
-function verifyPKCS12CertValidity()
-{
-	KEYSTORE=$1
-    PASSWORD=$2
-    CURRENT_DATE=$3
-    MIN_CERT_VALIDITY=$4
-    VALIDITY=$(($CURRENT_DATE + ($MIN_CERT_VALIDITY*24*60*60)))
-  
-    if [ $VALIDITY -le $CURRENT_DATE ];
-    then
-        echo "Error : Invalid minimum validity days supplied"
-  		exit 1
-  	fi 
-}
-
-# Function does verification for JKS or PKCS12 based on KEY_STORE_TYPE
-function verifyCertValidity()
-{
-	KEYSTORE=$1
-    PASSWORD=$2
-    CURRENT_DATE=$3
-    MIN_CERT_VALIDITY=$4
-    KEY_STORE_TYPE=$5
-    if [[ $KEY_STORE_TYPE == "JKS" ]];
-    then
-		verifyJKSCertValidity $KEYSTORE $PASSWORD $CURRENT_DATE $MIN_CERT_VALIDITY
-	elif [[ $KEY_STORE_TYPE == "PKCS12" ]];
-	then
-		verifyPKCS12CertValidity $KEYSTORE $PASSWORD $CURRENT_DATE $MIN_CERT_VALIDITY
-	fi
-
-}
 
 #Creates weblogic deployment model for admin domain
 function create_admin_model()
