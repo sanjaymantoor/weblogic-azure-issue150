@@ -85,6 +85,8 @@ function verifyCertValidity()
     KEY_STORE_TYPE=$5
     VALIDITY=$(($CURRENT_DATE + ($MIN_CERT_VALIDITY*24*60*60)))
     
+    echo "Verifying $KEYSTORE is valid at least $MIN_CERT_VALIDITY days from the deployment"
+    
     if [ $VALIDITY -le $CURRENT_DATE ];
     then
         echo "Error : Invalid minimum validity days supplied"
@@ -119,6 +121,7 @@ function verifyCertValidity()
 			exit 1
 		fi		
 	done
+	echo "$KEYSTORE validation is successful"
 }
 
 
