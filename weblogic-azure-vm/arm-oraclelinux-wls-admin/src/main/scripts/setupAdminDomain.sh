@@ -89,7 +89,7 @@ function verifyCertValidity()
     
     if [ $VALIDITY -le $CURRENT_DATE ];
     then
-        echo "Error : Invalid minimum validity days supplied"
+        echo_stderr "Error : Invalid minimum validity days supplied"
   		exit 1
   	fi 
 
@@ -98,14 +98,14 @@ function verifyCertValidity()
 	runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE > /dev/null 2>&1"
 	if [ $? != 0 ];
 	then
-		echo "Error opening the keystore : $KEYSTORE"
+		echo_stderr "Error opening the keystore : $KEYSTORE"
 		exit 1
 	fi
 
 	aliasList=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE | grep Alias" |awk '{print $3}'`
 	if [[ -z $aliasList ]]; 
 	then 
-		echo "Error : No alias found in supplied certificate"
+		echo_stderr "Error : No alias found in supplied certificate"
 		exit 1
 	fi
 	
@@ -118,7 +118,7 @@ function verifyCertValidity()
 		VALIDITY_REMIANS_SECONDS=`expr $CERT_UNTIL_SECONDS - $VALIDITY`
 		if [[ $VALIDITY_REMIANS_SECONDS -le 0 ]];
 		then
-			echo "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY day"
+			echo_stderr "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY day"
 			exit 1
 		fi		
 	done
