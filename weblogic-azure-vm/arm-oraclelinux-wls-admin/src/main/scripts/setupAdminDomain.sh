@@ -85,7 +85,7 @@ function verifyCertValidity()
     KEY_STORE_TYPE=$5
     VALIDITY=$(($CURRENT_DATE + ($MIN_CERT_VALIDITY*24*60*60)))
     
-    echo "Verifying $KEYSTORE is valid at least $MIN_CERT_VALIDITY days from the deployment"
+    echo "Verifying $KEYSTORE is valid at least $MIN_CERT_VALIDITY day from the deployment time"
     
     if [ $VALIDITY -le $CURRENT_DATE ];
     then
@@ -94,7 +94,8 @@ function verifyCertValidity()
   	fi 
 
 	# Check whether KEYSTORE supplied can be opened for reading
-	runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE"
+	# Redirecting as no need to display the contents
+	runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE > /dev/null 2>&1"
 	if [ $? != 0 ];
 	then
 		echo "Error opening the keystore : $KEYSTORE"
@@ -117,7 +118,7 @@ function verifyCertValidity()
 		VALIDITY_REMIANS_SECONDS=`expr $CERT_UNTIL_SECONDS - $VALIDITY`
 		if [[ $VALIDITY_REMIANS_SECONDS -le 0 ]];
 		then
-			echo "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY days"
+			echo "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY day"
 			exit 1
 		fi		
 	done
