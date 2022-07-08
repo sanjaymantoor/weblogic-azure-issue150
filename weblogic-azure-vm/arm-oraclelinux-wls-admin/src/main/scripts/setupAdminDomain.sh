@@ -428,7 +428,7 @@ function validateSSLKeyStores()
        echo "Error : Identity Keystore Validation Failed !!"
        exit 1
    fi
-
+   
    # Verify Identity keystore validity period more than MIN_CERT_VALIDITY
    verifyCertValidity $customIdentityKeyStoreFileName $customIdentityKeyStorePassPhrase $CURRENT_DATE $MIN_CERT_VALIDITY $customIdentityKeyStoreType
 
@@ -443,7 +443,6 @@ function validateSSLKeyStores()
    # Verify Identity keystore validity period more than MIN_CERT_VALIDITY
    verifyCertValidity $customTrustKeyStoreFileName $customTrustKeyStorePassPhrase $CURRENT_DATE $MIN_CERT_VALIDITY $customTrustKeyStoreType
    
-
    echo "ValidateSSLKeyStores Successfull !!"
 }
 
