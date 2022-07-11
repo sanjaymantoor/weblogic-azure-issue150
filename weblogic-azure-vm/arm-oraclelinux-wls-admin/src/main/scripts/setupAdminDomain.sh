@@ -648,9 +648,6 @@ installUtilities
 
 mountFileShare
 
-# Wait for mounting operation to complete
-sleep 5s
-
 SERVER_STARTUP_ARGS="-Dlog4j2.formatMsgNoLookups=true"
 KEYSTORE_PATH="${DOMAIN_PATH}/${wlsDomainName}/keystores"
 wlsAdminPort=7001

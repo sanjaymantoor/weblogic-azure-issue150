@@ -389,7 +389,6 @@ function create_adminSetup()
         exit 1
     fi
 
-    storeCustomSSLCerts
     create_admin_model
     sudo chown -R $username:$groupname $DOMAIN_PATH
     runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; $DOMAIN_PATH/weblogic-deploy/bin/createDomain.sh -oracle_home $oracleHome -domain_parent $DOMAIN_PATH  -domain_type WLS -model_file $DOMAIN_PATH/admin-domain.yaml"
@@ -559,8 +558,6 @@ function create_managedSetup(){
         echo "weblogic-deploy tool not found in path $DOMAIN_PATH"
         exit 1
     fi
-
-    storeCustomSSLCerts
 
     echo "Creating managed server model files"
     create_managed_model
@@ -975,6 +972,9 @@ username="oracle"
 groupname="oracle"
 
 cleanup
+
+# Executing this function first just to make sure certificate errors are first caught
+storeCustomSSLCerts
 
 installUtilities
 mountFileShare
