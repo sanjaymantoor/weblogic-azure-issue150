@@ -223,7 +223,7 @@ function create_adminDomain()
     fi
 
     storeCustomSSLCerts
-
+	sleep 2s
     create_admin_model
     sudo chown -R $username:$groupname $DOMAIN_PATH
     runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; $DOMAIN_PATH/weblogic-deploy/bin/createDomain.sh -oracle_home $oracleHome -domain_parent $DOMAIN_PATH  -domain_type WLS -model_file $DOMAIN_PATH/admin-domain.yaml"
