@@ -527,6 +527,12 @@ function verifyService()
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BASE_DIR="$(readlink -f ${CURR_DIR})"
 
+# Used for certificate expiry validation
+CURRENT_DATE=`date +%s`
+# Supplied certificate to have minimum days validity for the deployment
+# In this case set for 1 day
+MIN_CERT_VALIDITY="1"
+
 read OHS_DOMAIN_NAME OHS_COMPONENT_NAME OHS_NM_USER OHS_NM_PSWD OHS_HTTP_PORT OHS_HTTPS_PORT WLS_REST_URL WLS_USER WLS_PASSWORD OHS_KEY_STORE_DATA OHS_KEY_STORE_PASSPHRASE ORACLE_VAULT_PASSWORD OHS_KEY_TYPE
 
 JDK_PATH="/u01/app/jdk"
