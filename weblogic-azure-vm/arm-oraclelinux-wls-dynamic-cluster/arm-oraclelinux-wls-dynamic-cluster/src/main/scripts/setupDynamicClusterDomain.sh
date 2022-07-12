@@ -518,8 +518,6 @@ function create_managedSetup(){
         exit 1
     fi
 
-    storeCustomSSLCerts
-
     echo "Creating managed server model files"
     create_managed_model
     createServerStartArgumentPyScript
