@@ -105,7 +105,7 @@ function verifyCertValidity()
 	aliasList=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE | grep Alias" |awk '{print $3}'`
 	if [[ -z $aliasList ]]; 
 	then 
-		echo_stderr "Error : No alias found in supplied certificate"
+		echo_stderr "Error : No alias found in supplied certificate $KEYSTORE"
 		exit 1
 	fi
 	
@@ -118,7 +118,8 @@ function verifyCertValidity()
 		VALIDITY_REMIANS_SECONDS=`expr $CERT_UNTIL_SECONDS - $VALIDITY`
 		if [[ $VALIDITY_REMIANS_SECONDS -le 0 ]];
 		then
-			echo_stderr "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY day"
+			echo_stderr "$KEYSTORE is \"$VALIDITY_PERIOD\""
+			echo_stderr "Error : Supplied certificate $KEYSTORE is either expired or expiring soon within $MIN_CERT_VALIDITY day"
 			exit 1
 		fi		
 	done
@@ -222,7 +223,6 @@ function create_adminDomain()
         exit 1
     fi
 
-    storeCustomSSLCerts
     create_admin_model
     sudo chown -R $username:$groupname $DOMAIN_PATH
     runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; $DOMAIN_PATH/weblogic-deploy/bin/createDomain.sh -oracle_home $oracleHome -domain_parent $DOMAIN_PATH  -domain_type WLS -model_file $DOMAIN_PATH/admin-domain.yaml"
@@ -643,6 +643,9 @@ startWebLogicScript="${DOMAIN_PATH}/${wlsDomainName}/startWebLogic.sh"
 stopWebLogicScript="${DOMAIN_PATH}/${wlsDomainName}/bin/customStopWebLogic.sh"
 
 validateInput
+
+# Executing this function first just to make sure certificate errors are first caught
+storeCustomSSLCerts
 
 installUtilities
 
