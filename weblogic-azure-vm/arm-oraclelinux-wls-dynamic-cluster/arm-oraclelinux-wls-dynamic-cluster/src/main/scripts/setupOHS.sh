@@ -110,14 +110,14 @@ function verifyCertValidity()
 
 	# Check whether KEYSTORE supplied can be opened for reading
 	# Redirecting as no need to display the contents
-	runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE > /dev/null 2>&1"
+	runuser -l oracle -c "keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE > /dev/null 2>&1"
 	if [ $? != 0 ];
 	then
 		echo "Error opening the keystore : $KEYSTORE"
 		exit 1
 	fi
 
-	aliasList=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE | grep Alias" |awk '{print $3}'`
+	aliasList=`runuser -l oracle -c "keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE | grep Alias" |awk '{print $3}'`
 	if [[ -z $aliasList ]]; 
 	then 
 		echo "Error : No alias found in supplied certificate"
@@ -126,7 +126,7 @@ function verifyCertValidity()
 	
 	for alias in $aliasList 
 	do
-		VALIDITY_PERIOD=`runuser -l oracle -c ". $oracleHome/oracle_common/common/bin/setWlstEnv.sh; keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE -alias $alias | grep Valid"`
+		VALIDITY_PERIOD=`runuser -l oracle -c "keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE -alias $alias | grep Valid"`
 		echo "$KEYSTORE is \"$VALIDITY_PERIOD\""
 		CERT_UNTIL_DATE=`echo $VALIDITY_PERIOD | awk -F'until:|\r' '{print $2}'`
 		CERT_UNTIL_SECONDS=`date -d "$CERT_UNTIL_DATE" +%s`
