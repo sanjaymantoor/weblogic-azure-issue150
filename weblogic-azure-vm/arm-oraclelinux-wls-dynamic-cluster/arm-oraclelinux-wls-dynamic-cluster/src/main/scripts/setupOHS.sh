@@ -100,7 +100,7 @@ function verifyCertValidity()
     KEY_STORE_TYPE=$5
     VALIDITY=$(($CURRENT_DATE + ($MIN_CERT_VALIDITY*24*60*60)))
     
-    echo "Verifying $KEYSTORE is valid at least $MIN_CERT_VALIDITY day from the deployment time"
+    echo "Verifying $KEYSTORE is valid at least $MIN_CERT_VALIDITY day from the OHS deployment time"
     
     if [ $VALIDITY -le $CURRENT_DATE ];
     then
@@ -120,7 +120,7 @@ function verifyCertValidity()
 	aliasList=`runuser -l oracle -c "keytool -list -v -keystore $KEYSTORE  -storepass $PASSWORD -storetype $KEY_STORE_TYPE | grep Alias" |awk '{print $3}'`
 	if [[ -z $aliasList ]]; 
 	then 
-		echo_stderr "Error : No alias found in supplied certificate"
+		echo_stderr "Error : No alias found in supplied certificate $KEYSTORE"
 		exit 1
 	fi
 	
@@ -133,7 +133,8 @@ function verifyCertValidity()
 		VALIDITY_REMIANS_SECONDS=`expr $CERT_UNTIL_SECONDS - $VALIDITY`
 		if [[ $VALIDITY_REMIANS_SECONDS -le 0 ]];
 		then
-			echo_stderr "Error : Supplied certificate is either expired or expiring soon within $MIN_CERT_VALIDITY day"
+			echo_stderr "$KEYSTORE is \"$VALIDITY_PERIOD\""
+			echo_stderr "Error : Supplied certificate $KEYSTORE is either expired or expiring soon within $MIN_CERT_VALIDITY day"
 			exit 1
 		fi		
 	done
