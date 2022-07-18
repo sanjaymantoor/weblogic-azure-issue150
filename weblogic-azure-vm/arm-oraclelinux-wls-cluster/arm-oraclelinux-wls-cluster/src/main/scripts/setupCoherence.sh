@@ -827,6 +827,9 @@ fi
 validateInput
 cleanup
 
+# Executing this function first just to make sure certificate errors are first caught
+storeCustomSSLCerts
+
 if [ "$wlsServerName" == "${wlsAdminServerName}" ]; then
     createCoherenceCluster
     restartManagedServers
@@ -834,7 +837,6 @@ else
     installUtilities
     mountFileShare
     openManagedServerPorts
-    storeCustomSSLCerts
     createManagedSetup
     generateCustomHostNameVerifier
     copyCustomHostNameVerifierJarsToWebLogicClasspath

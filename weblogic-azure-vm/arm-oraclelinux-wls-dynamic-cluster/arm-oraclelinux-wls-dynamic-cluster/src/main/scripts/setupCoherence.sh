@@ -779,6 +779,8 @@ fi
 
 validateInput
 cleanup
+# Executing this function first just to make sure certificate errors are first caught
+storeCustomSSLCerts
 
 if [ $wlsServerName == "admin" ]; then
     createCoherenceClusterModel
@@ -787,7 +789,6 @@ else
     installUtilities
     mountFileShare
     openPortsForCoherence
-    storeCustomSSLCerts
     createManagedSetup
     generateCustomHostNameVerifier
     copyCustomHostNameVerifierJarsToWebLogicClasspath
