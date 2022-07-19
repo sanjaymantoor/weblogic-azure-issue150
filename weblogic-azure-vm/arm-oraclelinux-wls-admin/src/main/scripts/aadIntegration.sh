@@ -260,7 +260,7 @@ function parseLDAPCertificate()
     addsCertificate=${SCRIPT_PWD}/security/AzureADTrust.cer
     
     # Verify certificate validity period more than MIN_CERT_VALIDITY
-    verifyCertValidity $addsCertificate $CURRENT_DATE $MIN_CERT_VALIDITY
+    #verifyCertValidity $addsCertificate $CURRENT_DATE $MIN_CERT_VALIDITY
 }
 
 function importAADCertificate()
